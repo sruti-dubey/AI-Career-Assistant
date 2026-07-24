@@ -130,59 +130,59 @@ AI-Career-Assistant
 
 ## 📝 Google Form
 
-> *(Insert screenshot here)*
+![Google Form Screenshot](project-screenshots/google-form.png)
 
 ---
 
 ## ⚙️ Final n8n Workflow
 
-> *(Insert screenshot here)*
+![Final Workflow Screenshot](project-screenshots/final-workflow.png)
 
 ---
 
 ## 📄 Resume Analysis
 
-> *(Insert screenshot here)*
+![Resume Analysis Screenshot](project-screenshots/resume-analysis.png)
 
 ---
 
 ## 🎯 ATS Match Result
 
-> *(Insert screenshot here)*
+![ATS Match](project-screenshots/ats-match.png)
 
 ---
 
 ## 📧 Cover Letter Email
 
-> *(Insert screenshot here)*
+![Cover Letter Email](project-screenshots/cover-letter-mail.png)
 
 ---
 
 ## ✍️ AI Cover Letter
 
-> *(Insert screenshot here)*
+![Cover Letter](project-screenshots/cover-letter.png)
 
 ---
 
 ## 📊 Job Tracker (Google Sheets)
 
-> *(Insert screenshot here)*
+![Job Tracker](project-screenshots/job-tracker.png)
 
 ---
 
 ## 📅 Interview Reminder Email
 
-> *(Insert screenshot here)*
+![Interview Reminder](project-screenshots/interview-reminder.png)
 
 ---
 
 ## 💡 Weekly Career Tips Email
 
-> *(Insert screenshot here)*
+![Weekly Career Tips](project-screenshots/weekly-career-tips.png)
 
 ## 📧 Final Confirmation Email
 
-![Final Confirmation Email](screenshots/final-confirmation-email.png)
+![Confirmation Email](project-screenshots/confirmation-email.png)
 ---
 
 # 🚀 How to Run
