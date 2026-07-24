@@ -1,0 +1,338 @@
+{
+  "name": "ATS Match",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "jobDesc",
+              "name": "jobDescription",
+              "value": "={{ $('When Executed by Another Workflow').item.json.driveId }}",
+              "type": "string"
+            },
+            {
+              "id": "resumeId",
+              "name": "resumeFileId",
+              "value": "={{ $json.driveId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "81d5164a-696c-4597-adea-d3946e1820b2",
+      "name": "Extract Job Description",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "b1127388-6151-4a79-83b8-d9630acca794",
+      "name": "Combine Resume and Job Description",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        160,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.driveId }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "resumeFile"
+        }
+      },
+      "id": "20ab320f-9c4c-441c-938e-81e06d6c7a30",
+      "name": "Get Resume from Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -176,
+        208
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CRpV25ZY29QhZIbb",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "resumeFile",
+        "options": {
+          "joinPages": true
+        }
+      },
+      "id": "bfa17ef9-e23a-4c0d-a1ce-3a4f5ae38363",
+      "name": "Extract Resume Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=YOUR_GEMINI_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Compare the provided Resume against the given Job Description and evaluate the candidate for ATS compatibility.\\n\\nIMPORTANT:\\nReturn ONLY plain text.\\nDo NOT return JSON.\\nDo NOT return markdown code blocks.\\nDo NOT add greetings, notes, explanations, or any extra text.\\n\\nReturn strictly ONLY in the following format:\\n Dear Candidate,\\n Here is your ATS Match result:\\n\\nATS Score (0-100)\\n- XX/100\\n\\nMatch Status\\n- Excellent / Good / Average / Poor\\n\\nATS Feedback\\n- Point 1\\n- Point 2\\n- Point 3 (only if needed)\\n\\nMissing Skills\\n- Skill/Keyword 1\\n- Skill/Keyword 2\\n- Skill/Keyword 3\\n- Skill/Keyword 4\\n- Skill/Keyword 5\\n\\n(If there are no missing skills, write only:)\\n- No major missing skills.\\n\\nTailoring Tips\\n- Tip 1\\n- Tip 2\\n- Tip 3\\n\\nRules:\\n- ATS Score must be a number between 0 and 100 and display as XX/100.\\n- Match Status must be ONLY one of: Excellent, Good, Average, Poor.\\n- ATS Feedback must contain ONLY 2-3 concise bullet points (maximum 12 words per point).\\n- Missing Skills must contain ONLY the top 5 missing skills or keywords.\\n- Tailoring Tips must contain ONLY 3 short actionable bullet points (maximum 8 words per point).\\n- Every section must use bullet points.\\n- Keep the response concise, professional, and easy to read.\\n- Do NOT leave any section empty.\\n- Do NOT add any extra headings or text before or after the response.\\n\\nJob Description:\\n\"\n          + $('When Executed by Another Workflow').item.json.jobDescription +\n          \"\\n\\nResume:\\n\"\n          + $('Extract Resume Text').item.json.text\n        }\n      ]\n    }\n  ]\n}\n}}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "fba76be5-18ac-4f9c-8fe0-5eeb0dc30983",
+      "name": "Analyze with Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        352,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "driveId"
+            },
+            {
+              "name": "jobDescription"
+            },
+            {
+              "name": "email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -336,
+        112
+      ],
+      "id": "65dc37d2-6ee9-496f-89ac-968427b0baf4",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg",
+          "mode": "list",
+          "cachedResultName": "AI Career Assistant Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 230611012,
+          "mode": "list",
+          "cachedResultName": "ATS Match",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit#gid=230611012"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('When Executed by Another Workflow').item.json.email }}",
+            "ATS Match Result": "={{ $('Analyze with Gemini').item.json.candidates[0].content.parts[0].text }}",
+            "Date and Time": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ATS Match Result",
+              "displayName": "ATS Match Result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date and Time",
+              "displayName": "Date and Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        96
+      ],
+      "id": "caded596-19dc-4fa7-a082-e3d5215d46ed",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VrO0fEf3HDmcpTmg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "🎯 Your ATS Resume Match Report is Ready!",
+        "emailType": "text",
+        "message": "=\n{{ $('Analyze with Gemini').item.json.candidates[0].content.parts[0].text }}\n\nBest regards,\nATS Match team\n\n\n\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        96
+      ],
+      "id": "4ff64f9e-e613-42cb-b9aa-4bea9555742a",
+      "name": "Send a message",
+      "webhookId": "3cd088c6-b1cb-4068-bf64-bb95b28bdb3c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZAFag5oBzXA6mSfd",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract Job Description": {
+      "main": [
+        [
+          {
+            "node": "Combine Resume and Job Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Resume and Job Description": {
+      "main": [
+        [
+          {
+            "node": "Analyze with Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Resume from Drive": {
+      "main": [
+        [
+          {
+            "node": "Extract Resume Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Resume Text": {
+      "main": [
+        [
+          {
+            "node": "Combine Resume and Job Description",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Analyze with Gemini": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Resume from Drive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Job Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5a4af5d9-2dc0-4447-b2a8-091e86cf5497",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b87fadec2dcafbc408297844640760323aec47178b38413a8071126d0b608a0"
+  },
+  "nodeGroups": [],
+  "id": "aofBkojaEzqC2oco",
+  "tags": []
+}

@@ -1,0 +1,259 @@
+{
+  "name": "Cover Letter",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Write a professional ATS-friendly cover letter for the position of {{ $json.positionTitle }} at {{ $json.companyName }}.\n\nCandidate Name:\n{{ $json.candidateName }}\n\nJob Description:\n{{ $json.jobDescription }}\n\nUsing the candidate's resume, write a personalized cover letter that:\n\n- Addresses the candidate by name.\n- Highlights relevant skills and experience.\n- Matches the job description.\n- Shows enthusiasm for the company and role.\n- Uses a professional and confident tone.\n- Is 200-280 words long.\n\nIMPORTANT:\n\nReturn ONLY the content that will go inside the cover letter.\n\nDo NOT return:\n- <!DOCTYPE html>\n- <html>\n- <head>\n- <body>\n- CSS\n- JavaScript\n- Markdown\n- Triple backticks\n- Explanations\n- Notes\n\nReturn only the cover letter text, starting with:\n\nDear Hiring Manager,\n\nand ending the cover letter MANDATORILY with the exact phrase:\n\nSincerely,\n{{ $json.candidateName }}\n"
+            },
+            {
+              "id": "2",
+              "name": "email",
+              "type": "string",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "id": "3",
+              "name": "companyName",
+              "type": "string",
+              "value": "={{ $json.companyName }}"
+            },
+            {
+              "id": "4",
+              "name": "positionTitle",
+              "type": "string",
+              "value": "={{ $json.positionTitle }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e25d46d7-6d20-472c-b060-e635bdb06e1e",
+      "name": "Prepare Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxOutputTokens": 4096,
+          "temperature": 0.7
+        }
+      },
+      "id": "383d52d0-2a88-4150-97b2-8835bc1f8d1c",
+      "name": "Generate Cover Letter",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        16
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $(\"Prepare Prompt\").item.json.email }}",
+        "subject": "=Cover Letter",
+        "emailType": "text",
+        "message": "=Dear Candidate,\n\nThank you for applying for the {{ $(\"Prepare Prompt\").item.json.positionTitle }} position at {{ $(\"Prepare Prompt\").item.json.companyName }}\n\nWe have successfully generated your personalized cover letter based on your resume and the job description you provided.\n\nPlease find your cover letter attached with this email.\n\nDownload link:{{ $json.download_url }}\n\nWe wish you the very best in your job application.\n\nKind regards,\nAI Career Assistant\n\n\n\n",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": []
+          },
+          "senderName": "Cover Letter Generator"
+        }
+      },
+      "id": "d603933b-c0dd-410e-bfeb-4e11ce521a81",
+      "name": "Send Cover Letter",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        16
+      ],
+      "webhookId": "1cb45c80-9805-4243-b056-a6f378ed82f1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZAFag5oBzXA6mSfd",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rest.apitemplate.io/v2/create-pdf?template_id=dd577b2326ff37a0",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-key",
+              "value": "YOUR_APITEMPLATE_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        736,
+        16
+      ],
+      "id": "f7194a07-b18e-4ade-afed-c500c565935a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  json: {\n    template_id: \"dd577b2326ff37a0\",\n    output_pdf: \"Cover_Letter.pdf\",\n    coverLetter: $(\"Generate Cover Letter\").first().json.content.parts[0].text,\n    candidateName: $('When Executed by Another Workflow').first().json.candidateName,\n    companyName: $('When Executed by Another Workflow').first().json.companyName,\n    positionTitle: $('When Executed by Another Workflow').first().json.positionTitle\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        16
+      ],
+      "id": "a02c6a96-77b6-4e17-bea5-c35347be1498",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "candidateName"
+            },
+            {
+              "name": "jobDescription"
+            },
+            {
+              "name": "companyName"
+            },
+            {
+              "name": "positionTitle"
+            },
+            {
+              "name": "email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        16
+      ],
+      "id": "2a8e6d2d-a838-40fb-a536-12da6cf35f34",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Prepare Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Cover Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Cover Letter": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send Cover Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Prepare Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d47fd7fc-9c36-487a-8b4d-cf46d526c139",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b87fadec2dcafbc408297844640760323aec47178b38413a8071126d0b608a0"
+  },
+  "nodeGroups": [],
+  "id": "Aker3jZQ3xmbcV0w",
+  "tags": []
+}

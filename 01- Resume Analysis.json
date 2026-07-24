@@ -1,0 +1,327 @@
+{
+  "name": "Resume Analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        0
+      ],
+      "id": "c170dab2-f4a0-4696-a7b2-09222d7da594",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.driveId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        160,
+        0
+      ],
+      "id": "7ee0bf77-b691-4186-ba5d-eb225a9439a1",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CRpV25ZY29QhZIbb",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=YOUR_GEMINI_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"contents\": [{ \"parts\": [{ \"text\": \"You are a professional Resume Analyzer. Analyze the following resume text and write a clean, beautifully formatted email report,also write the headings like Resume Rating (0-10),Key Strengths,Areas for Improvement,Missing Skills,Recommendations in bold and size greater than there inside content. \\n\\nCRITICAL INSTRUCTIONS:\\n1. Do NOT use any markdown characters like asterisks (**), hashtags (###), or dashes (---).\\n2. Write in plain, highly readable text.\\n3. Use normal text capitalization for headings instead of markdown signs.\\n4. Use simple newlines to separate sections.\\n\\nStructure the body exactly like this:\\n Dear Candidate,\\n Thankyou for your submission! \\n Here is your Resume Analysis Results: \\n\\n1. Resume Rating (0-10):\\n[Provide rate here]\\n\\n2. Key Strengths:\\n[Provide 3-5 bullet points using standard dashes like - ]\\n\\n3. Areas for Improvement:\\n[Provide 3-5 points using standard dashes like - ]\\n\\n4. Missing Skills:\\n[Provide 3-5 points using standard dashes like - ]\\n\\n5. Recommendations:\\n[Provide final feedback within 2 points in bullet points]\\n\\nResume Text:\\n\" + $json.text }] }], \"generationConfig\": { \"temperature\": 0.5, \"maxOutputTokens\": 2048 } } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        464,
+        0
+      ],
+      "id": "3d0fe11c-a080-4554-bef3-cb5ced24da23",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "Candidate Name",
+              "value": "={{ $('When Executed by Another Workflow').item.json.candidateName || $('When Executed by Another Workflow').item.json.candidateName }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "Email",
+              "value": "={{ $('When Executed by Another Workflow').item.json.email || $('When Executed by Another Workflow').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "analysis",
+              "name": "Analysis Result",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "date",
+              "name": "Date & Time",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8fac34ba-924c-4e80-a3d9-7634174e0fb6",
+      "name": "Format Analysis",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg",
+          "mode": "list",
+          "cachedResultName": "Resume Analysis Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "Email": "={{ $json.Email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Candidate Name",
+              "displayName": "Candidate Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Analysis Result",
+              "displayName": "Analysis Result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date & Time",
+              "displayName": "Date & Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2631d496-43ff-4bc9-9b78-d9bc1940755d",
+      "name": "Save to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        784,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VrO0fEf3HDmcpTmg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email || $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "Your Resume Analysis Report",
+        "emailType": "text",
+        "message": "={{ $(\"Format Analysis\").item.json[\"Analysis Result\"] }}\n\nBest Regards,\nAI Resume Analysis Team\n\n\n\n\n\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "07599df8-6a2d-4233-826c-d34b729b5e37",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        0
+      ],
+      "webhookId": "814dd021-24cb-49ba-bf31-3a34ad230cc4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZAFag5oBzXA6mSfd",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "driveId"
+            },
+            {
+              "name": "candidateName"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "campanyName"
+            },
+            {
+              "name": "positionTitle"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "13aad42e-2150-4e06-b951-dffc181a6ca5",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Format Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Analysis": {
+      "main": [
+        [
+          {
+            "node": "Save to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "11583c64-22d7-40f3-8bb2-e86993f94760",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b87fadec2dcafbc408297844640760323aec47178b38413a8071126d0b608a0"
+  },
+  "nodeGroups": [],
+  "id": "YnKfAGine78Nkd7W",
+  "tags": []
+}

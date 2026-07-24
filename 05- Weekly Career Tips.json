@@ -1,0 +1,289 @@
+{
+  "name": "Weekly Career Tips",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg",
+          "mode": "list",
+          "cachedResultName": "AI Career Assistant Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Resume Analysis Result",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        0
+      ],
+      "id": "5e1f7302-7d94-4274-8f34-85d7f0981ba1",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VrO0fEf3HDmcpTmg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=YOUR_GEMINI_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"You are a career assistant coach.\\n\\nBased on the candidate's previous resume analysis, generate ONLY 3 short and actionable weekly career tips.\\n\\nRules:\\n- Each tip must be 1-2 sentences only.\\n- Keep the total response under 120 words.\\n- Use simple, motivating language.\\n- Focus on Data Structures, Algorithms, or Core CS concepts.\\n- Do NOT include introductions, conclusions, headings, markdown, or extra paragraphs.\\n- Return only the 3 numbered tips.\\n\\nCandidate Name: {{ $json['Candidate Name'] }}\\n\\nAnalysis Context:\\n{{ ($json['Analysis Result'] || '').replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, ' ') }}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 3000
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        320,
+        0
+      ],
+      "id": "bec46e30-c8b6-498c-8e63-a0a57be07d5e",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1cd98b64-1b0f-4b7e-aab2-810396f2eb0f",
+              "name": "Candidate Name",
+              "value": "={{ $('Get row(s) in sheet').item.json['Candidate Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "50ab4187-5046-433e-8083-541f4f23f067",
+              "name": "Email",
+              "value": "={{ $('Get row(s) in sheet').item.json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "a63d2d52-514d-4cbd-818a-4a50091ff061",
+              "name": "Weekly Tips",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        0
+      ],
+      "id": "9e82fc57-b49f-4987-9917-fd774c3d273f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg",
+          "mode": "list",
+          "cachedResultName": "AI Career Assistant Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 170000020,
+          "mode": "list",
+          "cachedResultName": "Weekly Career Tips",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit#gid=170000020"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Candidate Name": "={{ $json['Candidate Name'] }}",
+            "Email": "={{ $json.Email }}",
+            "Weekly Tips": "={{ $json['Weekly Tips'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Candidate Name",
+              "displayName": "Candidate Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Weekly Tips",
+              "displayName": "Weekly Tips",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        0
+      ],
+      "id": "472d163f-9cd8-47f0-95ac-25ef50f1f2a9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VrO0fEf3HDmcpTmg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$json[\"Email\"]}}",
+        "subject": "Your Weekly Career Tips ",
+        "message": "=<!DOCTYPE html>\n<html>\n<head>\n<style>\nbody{\n    font-family:Arial,sans-serif;\n    background:#f5f7fb;\n    padding:20px;\n}\n.container{\n    max-width:650px;\n    margin:auto;\n    background:#ffffff;\n    border-radius:12px;\n    padding:30px;\n    border:1px solid #e5e5e5;\n}\n.header{\n    background:#4F46E5;\n    color:white;\n    padding:18px;\n    border-radius:8px;\n    text-align:center;\n    font-size:24px;\n    font-weight:bold;\n}\n.card{\n    margin-top:20px;\n    background:#f8fafc;\n    padding:20px;\n    border-left:5px solid #4F46E5;\n    border-radius:8px;\n    white-space:pre-wrap;\n    line-height:1.7;\n}\n.footer{\n    margin-top:30px;\n    font-size:14px;\n    color:#666;\n    text-align:center;\n}\n</style>\n</head>\n\n<body>\n\n<div class=\"container\">\n\n<div class=\"header\">\n Weekly Career Tips\n</div>\n\n<h2>Hello {{$json[\"Candidate Name\"]}},</h2>\n\n<p>\nHere are your personalized career tips generated based on your latest resume analysis.\nKeep practicing consistently and improve your technical skills every week.\n</p>\n\n<div class=\"card\">\n\n{{$json[\"Weekly Tips\"]}}\n\n</div>\n\n<p>\nBest wishes for your learning journey and upcoming interviews! \n</p>\n\n<div class=\"footer\">\nAI Career Assistant<br>\nPowered by n8n + Gemini AI\n</div>\n\n</div>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        0
+      ],
+      "id": "a8f911c9-0334-4046-b7a7-3ad3fcd510d2",
+      "name": "Send a message",
+      "webhookId": "a520e313-e4a8-4017-a8f0-c23c1e0274ac",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZAFag5oBzXA6mSfd",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bff7dfcd-a653-4df8-9276-c1f3910ec60b",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0df1d398-727e-4128-8bb0-bb9db6c5a1a3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b87fadec2dcafbc408297844640760323aec47178b38413a8071126d0b608a0"
+  },
+  "nodeGroups": [],
+  "id": "Rc5VS5yRDhOHD0he",
+  "tags": []
+}

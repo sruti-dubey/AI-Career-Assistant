@@ -1,0 +1,174 @@
+{
+  "name": "Job Tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg",
+          "mode": "list",
+          "cachedResultName": "AI Career Assistant Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 773583423,
+          "mode": "list",
+          "cachedResultName": "Job Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit#gid=773583423"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company": "={{ $json.companyName }}",
+            "Position": "={{ $json.positionTitle }}",
+            "Status": "={{ $json.status }}",
+            "Interview date": "={{ $json.interviewDate }}",
+            "Email": "={{ $json.email }}",
+            "Job Description": "={{ $json.jobDescription }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Interview date",
+              "displayName": "Interview date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Description",
+              "displayName": "Job Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2a61fc32-ef92-455a-ba56-8d6d69ae4a7d",
+      "name": "Add to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VrO0fEf3HDmcpTmg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "companyName"
+            },
+            {
+              "name": "positionTitle"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "interviewDate"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "jobDescription"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1d1f1b00-025f-4ab4-a9e5-cb941077e8ff",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Add to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "68d9f7fd-455f-4e4d-a30f-42de91bdfca9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b87fadec2dcafbc408297844640760323aec47178b38413a8071126d0b608a0"
+  },
+  "nodeGroups": [],
+  "id": "jB6s3XwSDqxDdMP1",
+  "tags": []
+}

@@ -1,0 +1,623 @@
+{
+  "name": "Final Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Job Application Form",
+        "formDescription": "Please upload your details and resume.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Candidate Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Job Description",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Company Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Position Title ",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Status ",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Applied"
+                  },
+                  {
+                    "option": "Interview Scheduled"
+                  },
+                  {
+                    "option": "Selected"
+                  },
+                  {
+                    "option": "Rejected"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Interview Date",
+              "fieldType": "date"
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Form is submitted! Response has been recorded. Now you can check your Gmail for your responses. "
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -656,
+        160
+      ],
+      "id": "c7e50baa-d443-423f-bb5a-168c5251b97e",
+      "name": "On form submission",
+      "webhookId": "ac244c89-bb45-48e6-a020-67142eeb8549"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "Resume",
+        "name": "={{ $json.Resume[0].filename }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1mwt76erbY7XIjKk63a1PaFR68nhTUr1F",
+          "mode": "list",
+          "cachedResultName": "ATS Career Assistant Resumes",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mwt76erbY7XIjKk63a1PaFR68nhTUr1F"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -496,
+        160
+      ],
+      "id": "c82ccace-c900-4245-99be-d6e3af755d76",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CRpV25ZY29QhZIbb",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "=YnKfAGine78Nkd7W",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/=YnKfAGine78Nkd7W"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "driveId": "={{ $json.id }}",
+            "candidateName": "={{ $('On form submission').item.json['Candidate Name'] }}",
+            "email": "={{ $('On form submission').item.json.Email }}",
+            "campanyName": "={{ $('On form submission').item.json['Company Name'] }}",
+            "positionTitle": "={{ $('On form submission').item.json['Position Title '] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "driveId",
+              "displayName": "driveId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "candidateName",
+              "displayName": "candidateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "campanyName",
+              "displayName": "campanyName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "positionTitle",
+              "displayName": "positionTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        160
+      ],
+      "id": "f87f40b1-0ccc-4253-b36b-d829d4c58d4c",
+      "name": "Call 'Resume Analysis'"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f8cd72c8-5b8e-4754-9ba3-6ebcb6dd6aad",
+              "leftValue": "={{ $('On form submission').item.json['Job Description'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        160
+      ],
+      "id": "f4218734-962c-4672-8235-99561054defd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "=aofBkojaEzqC2oco",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/=aofBkojaEzqC2oco"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "driveId": "={{ $('Upload file').item.json.id }}",
+            "jobDescription": "={{ $('On form submission').item.json['Job Description'] }}",
+            "email": "={{ $('On form submission').item.json.Email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "driveId",
+              "displayName": "driveId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "jobDescription",
+              "displayName": "jobDescription",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c68b532b-c423-42d9-ab40-89f3a2afe0ed",
+      "name": "Call 'ATS Match'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Aker3jZQ3xmbcV0w",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/Aker3jZQ3xmbcV0w"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "candidateName": "={{ $('On form submission').item.json['Candidate Name'] }}",
+            "jobDescription": "={{ $('On form submission').item.json['Job Description'] }}",
+            "companyName": "={{ $('On form submission').item.json['Company Name'] }}",
+            "positionTitle": "={{ $('On form submission').item.json['Position Title '] }}",
+            "email": "={{ $('On form submission').item.json.Email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "candidateName",
+              "displayName": "candidateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "jobDescription",
+              "displayName": "jobDescription",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "companyName",
+              "displayName": "companyName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "positionTitle",
+              "displayName": "positionTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "179e295b-f934-48ad-9cd1-63ecc12e0d04",
+      "name": "Call 'Cover Letter'"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        160
+      ],
+      "id": "915314f0-bacf-47a1-a3f1-bcfdbae6b211",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "jB6s3XwSDqxDdMP1",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/jB6s3XwSDqxDdMP1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "companyName": "={{ $('On form submission').item.json['Company Name'] }}",
+            "positionTitle": "={{ $('On form submission').item.json['Position Title '] }}",
+            "status": "={{ $('On form submission').item.json['Status '] }}",
+            "interviewDate": "={{ $('On form submission').item.json['Interview Date'] }}",
+            "email": "={{ $('On form submission').item.json.Email }}",
+            "jobDescription": "={{ $('On form submission').item.json['Job Description'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "companyName",
+              "displayName": "companyName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "positionTitle",
+              "displayName": "positionTitle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "interviewDate",
+              "displayName": "interviewDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "jobDescription",
+              "displayName": "jobDescription",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        160
+      ],
+      "id": "1324a892-6060-4a04-96b0-35287d6919a5",
+      "name": "Call 'Job Tracker'"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "🎉 Your AI Career Assistant Request Has Been Processed",
+        "message": "=<div style=\"font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px;\">   <h2>Dear {{ $('On form submission').item.json.Name || 'Candidate' }},</h2>    <p>Thank you for using <strong>AI Career Assistant</strong>.</p>   <p>Your request has been processed successfully!</p>    <hr style=\"border: 0; border-top: 1px solid #ccc; margin: 20px 0;\" />    <h3>Here's what has been completed:</h3>   <ul>     <li>✅ <strong>Resume Analysis</strong> completed.</li>     <li>✅ <strong>ATS Match Report</strong> generated (if Job Description was provided).</li>     <li>✅ <strong>Cover Letter</strong> generated (if Job Description was provided).</li>     <li>✅ <strong>Job Application</strong> has been added to the Job Tracker.</li>   </ul>    <h3>What's next?</h3>   <ul>     <li>📅 <strong>Weekly Career Tips</strong> will be sent every Sunday.</li>     <li>🔔 If you provided an <strong>Interview Date</strong>, you will automatically receive an Interview Reminder before your interview.</li>   </ul>    <br />   <p>Thank you for using AI Career Assistant.</p>   <p>Best Regards,<br /><strong>AI Career Assistant Team</strong></p> </div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        160
+      ],
+      "id": "a42fa0e1-fe56-420e-9fc8-7a6a40d3326b",
+      "name": "Send a message",
+      "webhookId": "2647958f-f139-4602-9bfa-f8bc4001a985",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZAFag5oBzXA6mSfd",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Call 'Resume Analysis'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Resume Analysis'": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Call 'ATS Match'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call 'ATS Match'": {
+      "main": [
+        [
+          {
+            "node": "Call 'Cover Letter'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Cover Letter'": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Call 'Job Tracker'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Job Tracker'": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "78fa13ac-daf6-462d-8510-612c3fe21042",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b87fadec2dcafbc408297844640760323aec47178b38413a8071126d0b608a0"
+  },
+  "nodeGroups": [],
+  "id": "vP5ETJoZ9erWBOen",
+  "tags": []
+}

@@ -1,0 +1,167 @@
+{
+  "name": "Interview Reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -624,
+        64
+      ],
+      "id": "e3cbb6bb-39d8-4ceb-ae3f-435ef8b84635",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg",
+          "mode": "list",
+          "cachedResultName": "AI Career Assistant Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 773583423,
+          "mode": "list",
+          "cachedResultName": "Job Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sKzVldhfsRnY0Fw2goOwQ5DtbLJZrbUd7ftdzAz39dg/edit#gid=773583423"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -464,
+        64
+      ],
+      "id": "27f215f7-af46-4875-88af-7dd6435db580",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VrO0fEf3HDmcpTmg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "358707fd-c11a-4122-a5bb-547c8da7bd45",
+              "leftValue": "={{ $json['Interview date'] }}",
+              "rightValue": "={{ $now.plus({ days: 1 }).toFormat('yyyy-MM-dd') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -320,
+        64
+      ],
+      "id": "b81104e4-56f8-4bd7-90e8-ff69f7fa1d1a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get row(s) in sheet').item.json.Email }}",
+        "subject": "=Interview Reminder: {{ $('Get row(s) in sheet').item.json.Position }} role at {{ $('Get row(s) in sheet').item.json.Company }}",
+        "message": "=<p>Dear Candidate,</p>\n\n<p>This is a reminder for your upcoming interview for the <strong>{{ $('Get row(s) in sheet').item.json.Position }}</strong> position at <strong>{{ $('Get row(s) in sheet').item.json.Company }}</strong>.</p>\n\n<p><strong>Interview Date:</strong>{{ $('Get row(s) in sheet').item.json['Interview date'] }}</p>\n\n<p>Best of luck!<br>\nHR Team</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        -48
+      ],
+      "id": "adfcdb7f-7e98-402f-84ad-544d8c116109",
+      "name": "Send a message",
+      "webhookId": "79e8c793-fb04-46ff-bc71-2972dd183199",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZAFag5oBzXA6mSfd",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "711d07b1-ab54-40a2-a079-971346eda684",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b87fadec2dcafbc408297844640760323aec47178b38413a8071126d0b608a0"
+  },
+  "nodeGroups": [],
+  "id": "14KYIVh29d4c0GOX",
+  "tags": []
+}
