@@ -11,7 +11,9 @@ AI Career Assistant is an end-to-end workflow automation project designed to sim
 The user submits a Google Form with their resume and job details. The workflow automatically analyzes the resume, evaluates ATS compatibility, generates a personalized cover letter, stores application details, schedules interview reminders, and sends weekly career improvement tips through email.
 
 A confirmation email is also sent to the user, informing them about the services they received based on the information submitted in the form.
+## 🌐 Live Demo
 
+### 🚀 [Try the AI Career Assistant](https://sruti-1.app.n8n.cloud/form/ac244c89-bb45-48e6-a020-67142eeb8549)
 ---
 
 # ✨ Key Features
